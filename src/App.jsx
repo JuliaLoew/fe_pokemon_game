@@ -17,7 +17,7 @@ import {
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path="" element={<MainLayout />}>
     <Route index element={<Home />} />
-    <Route path="Details" element={<Details/>} />
+    <Route path="Details/:id" element={<Details/>} />
     <Route path="Roster" element={<Roster/>} />
     <Route path="Battle" element={<Battle/>} />
     <Route path="Leaderboard" element={<Leaderboard/>} />
