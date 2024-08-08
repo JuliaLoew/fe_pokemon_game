@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const RosterPage = () => {
   const [roster, setRoster] = useState([]);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     // Load roster from localStorage on component mount
@@ -15,6 +17,10 @@ const RosterPage = () => {
     const updatedRoster = roster.filter((pokemon) => pokemon.id !== id); // Filter out the selected pokemon from the roster
     setRoster(updatedRoster); // Update the roster state
     localStorage.setItem("pkmRoster", JSON.stringify(updatedRoster)); // Save updated roster to localStorage
+  };
+
+  const showDetails = (id) => {
+    navigate(`/Details/${id}`);
   };
 
   return (
@@ -37,6 +43,12 @@ const RosterPage = () => {
               <p className="height text-center">Height: {pokemon.height} ft</p>
               <p className="weight text-center">Weight: {pokemon.weight} lbs</p>
             </div>
+            <button
+              onClick={() => showDetails(pokemon.id)}
+              className="mx-4 inline-flex items-center justify-center rounded-lg border-2 border-blue-500 p-2 font-bold"
+            >
+              Details
+            </button>
             <button
               onClick={() => removeFromRoster(pokemon.id)}
               className="mx-4 inline-flex items-center justify-center rounded-lg border-2 border-red-500 p-2 font-bold"

@@ -33,14 +33,14 @@ const MainLayout = () => {
                   Home
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/Details"
-                  className="text-2xl hover:underline hover:underline-offset-4"
-                >
-                  Details
-                </Link>
-              </li>
+              {/*<li>*/}
+              {/*  <Link*/}
+              {/*    to="/Details"*/}
+              {/*    className="text-2xl hover:underline hover:underline-offset-4"*/}
+              {/*  >*/}
+              {/*    Details*/}
+              {/*  </Link>*/}
+              {/*</li>*/}
               <li>
                 <Link
                   to="/Roster"
