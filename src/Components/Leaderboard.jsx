@@ -39,6 +39,8 @@ const Leaderboard = () => {
   // Spieler nach Siegen sortieren
   const sortedPlayers = players.sort((a, b) => b.score - a.score);
 
+
+  // gibt die Tabelle aus
     return <div>
       <h1 className="text-center text-3xl font-bold underline py-4">Leaderboard</h1>
       <div className="max-w-4xl mx-auto rounded-lg shadow-md overflow-hidden">

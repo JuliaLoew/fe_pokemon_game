@@ -62,7 +62,7 @@ const MainLayout = () => {
                   to="/Leaderboard"
                   className="text-2xl hover:underline hover:underline-offset-4"
                 >
-                  Lederboard
+                  Leaderboard
                 </Link>
               </li>
             </ul>
