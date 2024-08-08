@@ -1,6 +1,7 @@
 const pokemonDetails = async (pokemonId) => {
   try {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
+    const url = `https://pokeapi.co/api/v2/pokemon/${pokemonId}`;
+    const response = await fetch(url);
     if (response.ok) {
       const data = await response.json();
 
@@ -13,7 +14,8 @@ const pokemonDetails = async (pokemonId) => {
         weight: data.weight,
         abilities: data.abilities.map((element) => element.ability.name),
         baseStats: data.stats.map((element) => ({ name: element.stat.name, value: element.base_stat })),
-        moves: data.moves.map((element) => element.move.name)
+        moves: data.moves.map((element) => element.move.name),
+        url: url
       };
     }
   } catch (error) {

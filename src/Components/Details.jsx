@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import pokemonDetails from "../utils/pokemonDetails.jsx";
+import { fetchOnePokemon, savePokemonToRoster } from "../utils/utils.js";
 
 
 const Details = () => {
@@ -8,13 +9,11 @@ const Details = () => {
   const [pokemon, setPokemon] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log(id);
         const pokemonData = await pokemonDetails(id);
         setPokemon(pokemonData);
       } catch (error) {
@@ -82,10 +81,8 @@ const Details = () => {
           </div>
 
           <div className="mt-4 flex justify-end">
-            <button onClick={() => onBack()}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Back
-            </button>
-            <button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add to roster
+            <button onClick={() => onAdd()}
+                    className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add to roster
             </button>
             <button onClick={() => onRemove()}
                     className="ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Remove
@@ -96,21 +93,16 @@ const Details = () => {
     </div>
   );
 
-  function onBack() {
-    navigate(`/`);
-  }
-
-  function onAdd() {
-
+  async function onAdd() {
+    const savePokemon = await fetchOnePokemon(pokemon.url);
+    savePokemonToRoster(savePokemon);
   }
 
   function onRemove() {
     const savedRoster = JSON.parse(localStorage.getItem("pkmRoster")) || [];
     const newRoster = savedRoster.filter((pokemon) => pokemon.id !== parseInt(id, 10));
-
     localStorage.setItem("pkmRoster", JSON.stringify(newRoster)); // Save updated roster to localStorage
   }
-
 
 };
 
