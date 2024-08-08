@@ -78,7 +78,9 @@ const Home = () => {
 
   return (
     <div>
-      <div className="text-2xl">Choose 5 Pokemon you want to play with.</div>
+      <div className="text-2xl font-bold">
+        Liste of available Pokémon: Choose 5 Pokemon you want to play with.
+      </div>
       <input
         id="search"
         type="text"
