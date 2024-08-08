@@ -8,19 +8,21 @@ const Home = () => {
 
   useEffect(() => {
     fetchAllPokemons();
-    const savedRoster = JSON.parse(localStorage.getItem("pokemonRoster")) || [];
+    const savedRoster = JSON.parse(localStorage.getItem("pkmRoster")) || []; // korrigiert von PokemonRoster zu pkmRoster
     setRoster(savedRoster);
   }, []);
 
   async function fetchAllPokemons(limit = 100) {
     try {
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}`);
+      const response = await fetch(
+        `https://pokeapi.co/api/v2/pokemon?limit=${limit}`,
+      );
       const data = await response.json();
       const allPokemons = await Promise.all(
         data.results.map(async (pokemon) => {
           const pokemonData = await fetchOnePokemon(pokemon.url);
           return pokemonData;
-        })
+        }),
       );
       setPokemons(allPokemons);
     } catch (error) {
@@ -49,19 +51,19 @@ const Home = () => {
     const isAlreadyRoster = updatedRoster.some((p) => p.id === pokemon.id);
 
     if (isAlreadyRoster) {
-      alert(`${pokemon.name} you have already selected to play.`);
+      //alert(`${pokemon.name} you have already selected to play.`);
     } else {
       updatedRoster.push(pokemon);
       localStorage.setItem("pkmRoster", JSON.stringify(updatedRoster));
       setRoster(updatedRoster);
-      alert(`${pokemon.name} added to to your game list.`);
+      //alert(`${pokemon.name} added to to your game list.`);
     }
   }
 
   function filterPokemons(e) {
     const filter = e.target.value.toUpperCase();
     const filteredPokemons = pokemons.filter((pokemon) =>
-      pokemon.name.toUpperCase().startsWith(filter)
+      pokemon.name.toUpperCase().startsWith(filter),
     );
     if (filteredPokemons.length === 0) {
       alert("No Pokémon found");
@@ -71,7 +73,7 @@ const Home = () => {
   }
 
   function handleDetailsClick(pokemonId) {
-    navigate('/Details/${pokemonId}');
+    navigate("/Details/${pokemonId}");
   }
 
   return (
@@ -84,16 +86,16 @@ const Home = () => {
         type="text"
         placeholder="Search Pokémon"
         onChange={filterPokemons}
-        className="border-2 rounded-lg p-2"
+        className="rounded-lg border-2 p-2"
       />
       <ul id="pokemonList" className="flex flex-wrap justify-center">
         {pokemons.map((pokemon) => (
           <li
             key={pokemon.id}
-            className="flex flex-col items-center border-2 p-4 rounded-lg m-4 border-blue-400"
+            className="m-4 flex flex-col items-center rounded-lg border-2 border-blue-400 p-4"
           >
             <img
-              className="w-40 h-auto"
+              className="h-auto w-40"
               src={pokemon.picture}
               alt={pokemon.name}
             />
@@ -105,17 +107,20 @@ const Home = () => {
             </div>
             <button
               onClick={() => saveToRoster(pokemon)}
-              className={`inline-flex items-center justify-center mx-4 p-2 border-2 rounded-lg font-bold ${
+              className={`mx-4 inline-flex items-center justify-center rounded-lg border-2 p-2 font-bold ${
                 roster.find((p) => p.id === pokemon.id)
                   ? "bg-gray-300 text-red-500"
                   : "border-blue-400"
               }`}
             >
-              {roster.find((p) => p.id === pokemon.id) ? "I play with you" : "Play with me"}
+              {roster.find((p) => p.id === pokemon.id)
+                ? "I play with you"
+                : "Play with me"}
             </button>
             <button
-            onClick={() => handleDetailsClick(pokemon.id)}
-             className="inline-flex items-center justify-center mx-4 p-2 border-2 rounded-lg font-bold border-blue-400">
+              onClick={() => handleDetailsClick(pokemon.id)}
+              className="mx-4 inline-flex items-center justify-center rounded-lg border-2 border-blue-400 p-2 font-bold"
+            >
               More Details
             </button>
           </li>

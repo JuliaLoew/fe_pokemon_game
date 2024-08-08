@@ -1,13 +1,13 @@
 import {
-    createBrowserRouter,
-    createRoutesFromElements,
-    Link,
-    Navigate,
-    Outlet,
-    Route,
-    RouterProvider,
-  } from 'react-router-dom';
-import React from 'react';
+  createBrowserRouter,
+  createRoutesFromElements,
+  Link,
+  Navigate,
+  Outlet,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
+import React from "react";
 import { useState, useEffect } from "react";
 
 const MainLayout = () => {
@@ -46,13 +46,13 @@ const MainLayout = () => {
           <Outlet />
         </div>
 
-        <footer className='bg-gray-800 text-white p-4'>
+      <footer className="bg-blue-600 p-4 text-white">
         <div className="container mx-auto text-center">
           &copy; {new Date().getFullYear()} My App. All rights reserved.
         </div>
-        </footer>
-      </div>
-    );
-  };
-  
-  export default MainLayout;
+      </footer>
+    </div>
+  );
+};
+
+export default MainLayout;
