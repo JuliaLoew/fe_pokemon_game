@@ -97,16 +97,34 @@ const Battle = () => {
   if (localPoke === null) {
     return (
       <div className="flex w-full max-w-4xl items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 shadow-lg">
-        <p className="items-center text-center">
-          Bitte erst deine Pokemons wählen :)
+        <p className="items-center justify-center text-center">
+          Bitte zuerst 5 Pokemons wählen :)
         </p>{" "}
       </div>
     );
   }
   const Pokeobj = JSON.parse(localPoke);
+  if (Pokeobj.length < 5) {
+    let anz = 5 - Pokeobj.length;
+    return (
+      <div className="flex w-full max-w-4xl items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 shadow-lg">
+        <p className="items-center justify-center text-center">
+          Bitte zuerst {anz} weitere Pokemons wählen :)
+        </p>
+      </div>
+    );
+  }
 
   const sysPoke = localStorage.getItem("syspokemons");
   const Sysobj = JSON.parse(sysPoke);
+
+  let winner;
+  if (Math.random() > 0.5) {
+    winner = Pokeobj[0].name;
+    localStorage.removeItem(0);
+  } else {
+    winner = Sysobj[0].name;
+  }
 
   return (
     <div className="flex min-h-screen flex-col justify-center bg-black">
@@ -144,7 +162,7 @@ const Battle = () => {
                 </div>
               </div>
               <p className="underlined text-xl font-semibold text-green-500 decoration-red-900 decoration-double">
-                {Sysobj[0].name} won!
+                {winner} won!
               </p>
             </div>
             <div className="flex flex-col items-center">

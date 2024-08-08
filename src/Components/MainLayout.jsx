@@ -62,7 +62,7 @@ const MainLayout = () => {
                   to="/Leaderboard"
                   className="text-2xl hover:underline hover:underline-offset-4"
                 >
-                  Lederboard
+                  Leaderboard
                 </Link>
               </li>
             </ul>
@@ -70,7 +70,7 @@ const MainLayout = () => {
         </div>
       </header>
 
-      <div className="container mx-auto py-4">
+      <div className="container mx-auto flex justify-center py-4">
         <Outlet />
       </div>
 
