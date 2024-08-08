@@ -26,7 +26,7 @@ const Leaderboard = () => {
           </tr>
         </thead>
         <tbody>
-          <!-- Rows of the table will go here -->
+       
         </tbody>
       </table>
     </div>
