@@ -127,18 +127,16 @@ const Battle = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col justify-center bg-black">
-      <div className="flex flex-1 items-center justify-center">
+    <div className="flex h-max w-max flex-col items-center justify-center bg-black">
+      <div className="flex h-max flex-1 items-center justify-center">
         <div className="w-1/4 p-4">
           <HumanPokeTeam />
         </div>
-        <div className="flex w-1/2 flex-col items-center justify-center p-4">
-          <h1 className="mb-8 text-4xl font-extrabold text-rose-700">
-            BATTLE-1
-          </h1>
-          <div className="flex w-full max-w-4xl justify-around rounded-lg border-4 border-blue-400 bg-black p-6 shadow-lg">
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col items-center">
+        <div className="flex w-max flex-col place-content-stretch items-center justify-center p-4">
+          <h1 className="mb-8 text-4xl font-extrabold text-rose-700">BATTLE</h1>
+          <div className="flex w-min items-center justify-around rounded-lg border-4 border-blue-400 bg-black p-10 shadow-lg">
+            <div className="flex flex-col place-content-stretch items-center justify-center">
+              <div className="flex flex-col place-content-stretch items-center justify-center">
                 <img
                   src={Pokeobj[0].picture}
                   alt={Pokeobj[0].name}
@@ -147,26 +145,15 @@ const Battle = () => {
                 <p>{Pokeobj[0].name}</p>
               </div>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="mb-4 flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-red-400">
-                    {Pokeobj[0].name}
-                  </p>
-                </div>
-                <div className="mx-4 text-2xl text-rose-600">VS</div>
-                <div className="text-center opacity-50">
-                  <p className="text-2xl font-bold text-red-400">
-                    {Sysobj[0].name}
-                  </p>
+            <div className="flex flex-col place-content-stretch items-center justify-center">
+              <div className="mb-4 flex place-content-stretch items-center justify-center">
+                <div className="mx-4 place-content-stretch p-4 text-2xl text-rose-600">
+                  VS
                 </div>
               </div>
-              <p className="underlined text-xl font-semibold text-green-500 decoration-red-900 decoration-double">
-                {winner} won!
-              </p>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col items-center">
+            <div className="flex flex-col place-content-stretch items-center justify-center">
+              <div className="flex flex-col place-content-stretch items-center justify-center">
                 <img
                   src={Sysobj[0].pic}
                   alt={Sysobj[0].name}
@@ -176,6 +163,9 @@ const Battle = () => {
               </div>
             </div>
           </div>
+          <p className="underlined py-8 text-xl font-extrabold text-green-500 decoration-red-900 decoration-double">
+            {winner} won!
+          </p>
         </div>
         <div className="w-1/4 p-4">
           <SysPokeTeam />
