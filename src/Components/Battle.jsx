@@ -6,8 +6,8 @@ const randomint = (min, max) => {
   return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
 };
 
-const fetchPoke = async () => {
-  const pokemix = [];
+const fetchSystemPoke = async () => {
+  const systemPokemons = [];
   let anz = 5;
   while (anz > 0) {
     try {
@@ -22,116 +22,91 @@ const fetchPoke = async () => {
         id: data.id,
         pic: data.sprites.front_default,
       };
-      pokemix.push(pokemon);
+      systemPokemons.push(pokemon);
     } catch (error) {
       console.error("Fehler beim Abrufen der Daten: ", error);
     }
     anz--;
   }
 
-  const storedPokemons = localStorage.getItem("syspokemons");
-
-  if (storedPokemons) {
-    return pokemix;
-  } else {
-    localStorage.setItem("syspokemons", JSON.stringify(pokemix));
-  }
-
-  return pokemix;
+  return systemPokemons;
 };
 
-const SysPokeTeam = () => {
-  const [pokemons, setPokemons] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const storedPokemons = localStorage.getItem("syspokemons");
-      if (storedPokemons) {
-        setPokemons(JSON.parse(storedPokemons));
-      } else {
-        const result = await fetchPoke();
-        setPokemons(result);
-        localStorage.setItem("syspokemons", JSON.stringify(result));
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  return (
-    <div className="flex h-full flex-col items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 text-center shadow-lg">
-      <p className="font-extrabold text-yellow-500">COMPUTER</p>
-
-      {pokemons.map((pokemon, index) => (
-        <div key={index}>
-          <img src={pokemon.pic} alt={pokemon.name} className="mb-2" />
-          <p>{pokemon.name}</p>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const HumanPokeTeam = () => {
-  const localPoke = localStorage.getItem("pkmRoster");
-  const Pokeobj = JSON.parse(localPoke);
-
-  return (
-    <div className="flex h-full flex-col items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 text-center shadow-lg">
-      <p className="font-extrabold text-yellow-500">HUMAN</p>
-
-      {Pokeobj.map((pokemon, index) => (
-        <div key={index}>
-          <img src={pokemon.picture} alt={pokemon.name} className="mb-2" />
-          <p>{pokemon.name}</p>
-        </div>
-      ))}
-    </div>
-  );
-};
+let winner = "NAME";
 
 const Battle = () => {
-  fetchPoke();
+  const [systemPokemons, setSystemPokemons] = useState([]);
+  const [userPokemons, setUserPokemons] = useState([]);
+  const [fightUserPokemon, setFightUserPokemon] = useState([]);
+  const [fightSystemPokemon, setFightSystemPokemon] = useState([]);
 
-  const localPoke = localStorage.getItem("pkmRoster");
-  if (localPoke === null) {
-    return (
-      <div className="flex w-full max-w-4xl items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 shadow-lg">
-        <p className="items-center justify-center text-center">
-          Bitte zuerst 5 Pokemons wählen :)
-        </p>{" "}
-      </div>
-    );
-  }
-  const Pokeobj = JSON.parse(localPoke);
-  if (Pokeobj.length < 5) {
-    let anz = 5 - Pokeobj.length;
-    return (
-      <div className="flex w-full max-w-4xl items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 shadow-lg">
-        <p className="items-center justify-center text-center">
-          Bitte zuerst {anz} weitere Pokemons wählen :)
-        </p>
-      </div>
-    );
+  function deletePokemon(userPokemons, systemPokemons) {
+    if (Math.random() > 0.5) {
+      //console.log("sysPokemons", pokemons);
+      let pokemons = userPokemons;
+      pokemons.splice(0, 1);
+
+      if (pokemons[0].name != null) winner = pokemons[0].name;
+      setUserPokemons(pokemons);
+      setFightSystemPokemon(pokemons[0]);
+      //setTimeout(200000);
+    } else {
+      let pokemons = systemPokemons;
+      pokemons.splice(0, 1);
+
+      winner = pokemons[0].name;
+
+      setSystemPokemons(pokemons);
+      setFightUserPokemon(pokemons[0]);
+    }
+    return;
   }
 
-  const sysPoke = localStorage.getItem("syspokemons");
-  const Sysobj = JSON.parse(sysPoke);
+  function fightProcess(userPokemons, systemPokemons) {
+    while (systemPokemons.length > 0 || userPokemons.length > 0) {
+      console.log("TEST while");
+      setTimeout(deletePokemon(userPokemons, systemPokemons), 3000);
+    }
 
-  let winner;
-  if (Math.random() > 0.5) {
-    winner = Pokeobj[0].name;
-    localStorage.removeItem(0);
-  } else {
-    winner = Sysobj[0].name;
+    return;
   }
+
+  useEffect(() => {
+    try {
+      fetchSystemPoke().then((result) => {
+        setSystemPokemons(result);
+        setFightSystemPokemon(result[0]);
+        fightProcess(userPokemons, systemPokemons);
+      });
+      const localPoke = localStorage.getItem("pkmRoster");
+      const storedUserPoke = JSON.parse(localPoke);
+
+      setUserPokemons(storedUserPoke);
+      setFightUserPokemon(storedUserPoke[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   return (
     <div className="">
       <div className="flex h-max w-max flex-col items-center justify-center bg-black">
         <div className="flex h-max flex-1 items-center justify-center">
           <div className="w-1/4 p-4">
-            <HumanPokeTeam />
+            <div className="flex h-full flex-col items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 text-center shadow-lg">
+              <p className="font-extrabold text-yellow-500">HUMAN</p>
+
+              {userPokemons.map((pokemon, index) => (
+                <div key={index}>
+                  <img
+                    src={pokemon.picture}
+                    alt={pokemon.name}
+                    className="mb-2"
+                  />
+                  <p>{pokemon.name}</p>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="flex w-max flex-col place-content-stretch items-center justify-center p-4">
             <h1 className="mb-8 text-4xl font-extrabold text-rose-700">
@@ -141,11 +116,11 @@ const Battle = () => {
               <div className="flex flex-col place-content-stretch items-center justify-center">
                 <div className="flex h-[300px] w-[300px] flex-col items-center justify-center">
                   <img
-                    src={Pokeobj[0].picture}
-                    alt={Pokeobj[0].name}
+                    src={fightUserPokemon.picture}
+                    alt={fightUserPokemon.name}
                     className="h-[300px] w-[300px] object-cover"
                   />
-                  <p>{Pokeobj[0].name}</p>
+                  <p> {fightUserPokemon.name} </p>
                 </div>
               </div>
               <div className="flex flex-col place-content-stretch items-center justify-center">
@@ -158,11 +133,11 @@ const Battle = () => {
               <div className="flex flex-col place-content-stretch items-center justify-center">
                 <div className="flex h-[300px] w-[300px] flex-col items-center justify-center">
                   <img
-                    src={Sysobj[0].pic}
-                    alt={Sysobj[0].name}
+                    src={fightSystemPokemon.pic}
+                    alt={fightSystemPokemon.name}
                     className="h-[300px] w-[300px] object-cover"
                   />
-                  <p>{Sysobj[0].name}</p>
+                  <p>{fightSystemPokemon.name}</p>
                 </div>
               </div>
             </div>
@@ -171,7 +146,17 @@ const Battle = () => {
             </p>
           </div>
           <div className="w-1/4 p-4">
-            <SysPokeTeam />
+            {" "}
+            <div className="flex h-full flex-col items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 text-center shadow-lg">
+              <p className="font-extrabold text-yellow-500">COMPUTER</p>
+
+              {systemPokemons.map((pokemon, index) => (
+                <div key={index}>
+                  <img src={pokemon.pic} alt={pokemon.name} className="mb-2" />
+                  <p>{pokemon.name}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
