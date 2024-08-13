@@ -127,48 +127,52 @@ const Battle = () => {
   }
 
   return (
-    <div className="flex h-max w-max flex-col items-center justify-center bg-black">
-      <div className="flex h-max flex-1 items-center justify-center">
-        <div className="w-1/4 p-4">
-          <HumanPokeTeam />
-        </div>
-        <div className="flex w-max flex-col place-content-stretch items-center justify-center p-4">
-          <h1 className="mb-8 text-4xl font-extrabold text-rose-700">BATTLE</h1>
-          <div className="flex w-min items-center justify-around rounded-lg border-4 border-blue-400 bg-black p-10 shadow-lg">
-            <div className="flex flex-col place-content-stretch items-center justify-center">
-              <div className="flex h-[300px] w-[300px] flex-col items-center justify-center">
-                <img
-                  src={Pokeobj[0].picture}
-                  alt={Pokeobj[0].name}
-                  className="h-[300px] w-[300px] object-cover"
-                />
-                <p>{Pokeobj[0].name}</p>
+    <div className="">
+      <div className="flex h-max w-max flex-col items-center justify-center bg-black">
+        <div className="flex h-max flex-1 items-center justify-center">
+          <div className="w-1/4 p-4">
+            <HumanPokeTeam />
+          </div>
+          <div className="flex w-max flex-col place-content-stretch items-center justify-center p-4">
+            <h1 className="mb-8 text-4xl font-extrabold text-rose-700">
+              BATTLE
+            </h1>
+            <div className="flex w-min items-center justify-around rounded-lg border-4 border-blue-400 bg-black p-10 shadow-lg">
+              <div className="flex flex-col place-content-stretch items-center justify-center">
+                <div className="flex h-[300px] w-[300px] flex-col items-center justify-center">
+                  <img
+                    src={Pokeobj[0].picture}
+                    alt={Pokeobj[0].name}
+                    className="h-[300px] w-[300px] object-cover"
+                  />
+                  <p>{Pokeobj[0].name}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col place-content-stretch items-center justify-center">
-              <div className="mb-4 flex place-content-stretch items-center justify-center">
-                <div className="mx-4 place-content-stretch p-4 text-2xl text-rose-600">
-                  VS
+              <div className="flex flex-col place-content-stretch items-center justify-center">
+                <div className="mb-4 flex place-content-stretch items-center justify-center">
+                  <div className="mx-4 place-content-stretch p-4 text-2xl text-rose-600">
+                    VS
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col place-content-stretch items-center justify-center">
+                <div className="flex h-[300px] w-[300px] flex-col items-center justify-center">
+                  <img
+                    src={Sysobj[0].pic}
+                    alt={Sysobj[0].name}
+                    className="h-[300px] w-[300px] object-cover"
+                  />
+                  <p>{Sysobj[0].name}</p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col place-content-stretch items-center justify-center">
-              <div className="flex h-[300px] w-[300px] flex-col items-center justify-center">
-                <img
-                  src={Sysobj[0].pic}
-                  alt={Sysobj[0].name}
-                  className="h-[300px] w-[300px] object-cover"
-                />
-                <p>{Sysobj[0].name}</p>
-              </div>
-            </div>
+            <p className="underlined py-8 text-6xl font-extrabold text-green-500 decoration-red-900 decoration-double">
+              {winner} won!
+            </p>
           </div>
-          <p className="underlined py-8 text-6xl font-extrabold text-green-500 decoration-red-900 decoration-double">
-            {winner} won!
-          </p>
-        </div>
-        <div className="w-1/4 p-4">
-          <SysPokeTeam />
+          <div className="w-1/4 p-4">
+            <SysPokeTeam />
+          </div>
         </div>
       </div>
     </div>
