@@ -15,14 +15,14 @@ const Home = () => {
   async function fetchAllPokemons(limit = 100) {
     try {
       const response = await fetch(
-        `https://pokeapi.co/api/v2/pokemon?limit=${limit}`,
+        `https://pokeapi.co/api/v2/pokemon?limit=${limit}`
       );
       const data = await response.json();
       const allPokemons = await Promise.all(
         data.results.map(async (pokemon) => {
           const pokemonData = await fetchOnePokemon(pokemon.url);
           return pokemonData;
-        }),
+        })
       );
       setPokemons(allPokemons);
     } catch (error) {
@@ -40,7 +40,7 @@ const Home = () => {
         name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
         weight: pokemon.weight,
         height: pokemon.height,
-        picture: pokemon.sprites.front_default,
+        picture: pokemon.sprites.front_default
       };
     } catch (error) {
       console.error(`Error: ${error}`);
@@ -64,7 +64,7 @@ const Home = () => {
   function filterPokemons(e) {
     const filter = e.target.value.toUpperCase();
     const filteredPokemons = pokemons.filter((pokemon) =>
-      pokemon.name.toUpperCase().startsWith(filter),
+      pokemon.name.toUpperCase().startsWith(filter)
     );
     if (filteredPokemons.length === 0) {
       alert("No Pokémon found");
@@ -74,7 +74,7 @@ const Home = () => {
   }
 
   function handleDetailsClick(pokemonId) {
-    navigate("/Details/${pokemonId}");
+    navigate(`/Details/${pokemonId}`);
   }
 
   return (
