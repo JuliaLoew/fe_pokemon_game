@@ -90,7 +90,7 @@ const Battle = () => {
         setUserPokemons(newUserPokemons);
         setTurn('user');
       }
-    }, 400);
+    }, 1000);
 
     return () => clearInterval(battleInterval);
   }, [turn, currentSystemPokemonIndex, currentUserPokemonIndex, systemPokemons, userPokemons]);
@@ -102,12 +102,12 @@ const Battle = () => {
       <div className="relative w-full bg-gray-300 rounded-full h-6">
         <div
           className="bg-red-500 h-full rounded-full transition-all duration-500"
-          style={{ width: `${percentage}%` }}
+          style={{ width: `${percentage}%`, maxWidth: '100%' }}
         ></div>
         <div className=" top-0 left-0 w-full text-center text-xs font-medium text-white">
           {hp} / {100}
         </div>
-      </div>
+      </div >
     );
   };
 
