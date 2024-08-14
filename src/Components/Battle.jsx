@@ -1,169 +1,205 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
 
-const randomint = (min, max) => {
-  const minCeiled = Math.ceil(min);
-  const maxFloored = Math.floor(max);
-  return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
-};
-
-const fetchPoke = async () => {
-  const pokemix = [];
-  let anz = 5;
-  while (anz > 0) {
-    try {
-      let zahl = randomint(1, 900);
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${zahl}`);
-      if (!response.ok) {
-        throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      const pokemon = {
-        name: data.forms[0].name,
-        id: data.id,
-        pic: data.sprites.front_default,
-      };
-      pokemix.push(pokemon);
-    } catch (error) {
-      console.error("Fehler beim Abrufen der Daten: ", error);
-    }
-    anz--;
+const fetchRandomPokemons = async () => {
+  const promises = [];
+  for (let i = 0; i < 5; i++) {
+    const id = Math.floor(Math.random() * 898) + 1; // PokéAPI has Pokémon with ids from 1 to 898
+    promises.push(fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(res => res.json()));
   }
 
-  const storedPokemons = localStorage.getItem("syspokemons");
+  const pokemons = await Promise.all(promises);
+  return pokemons.map(pokemon => ({
+    ...pokemon,
+    name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
+    hp: pokemon.stats.find(stat => stat.stat.name === 'hp').base_stat,
+    attack: pokemon.stats.find(stat => stat.stat.name === 'attack').base_stat,
+    picture: pokemon.sprites.front_default,
+  }));
+};
 
-  if (storedPokemons) {
-    return pokemix;
-  } else {
-    localStorage.setItem("syspokemons", JSON.stringify(pokemix));
+
+const getUserPokemons = async () => {
+  const savedUserPokemons = JSON.parse(localStorage.getItem('pkmRoster')) || [];
+  if (savedUserPokemons.length === 0) {
+    alert('No user Pokémon found in localStorage!');
   }
-
-  return pokemix;
+  return savedUserPokemons.map(pokemon => ({
+    ...pokemon,
+    name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
+    hp: pokemon.stats.find(stat => stat.stat.name === 'hp').base_stat,
+    attack: pokemon.stats.find(stat => stat.stat.name === 'attack').base_stat,
+  }));
 };
 
-const SysPokeTeam = () => {
-  const [pokemons, setPokemons] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const storedPokemons = localStorage.getItem("syspokemons");
-      if (storedPokemons) {
-        setPokemons(JSON.parse(storedPokemons));
-      } else {
-        const result = await fetchPoke();
-        setPokemons(result);
-        localStorage.setItem("syspokemons", JSON.stringify(result));
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  return (
-    <div className="flex h-full flex-col items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 text-center shadow-lg">
-      <p className="font-extrabold text-yellow-500">COMPUTER</p>
-
-      {pokemons.map((pokemon, index) => (
-        <div key={index}>
-          <img src={pokemon.pic} alt={pokemon.name} className="mb-2" />
-          <p>{pokemon.name}</p>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const HumanPokeTeam = () => {
-  const localPoke = localStorage.getItem("pkmRoster");
-  const Pokeobj = JSON.parse(localPoke);
-
-  return (
-    <div className="flex h-full flex-col items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 text-center shadow-lg">
-      <p className="font-extrabold text-yellow-500">HUMAN</p>
-
-      {Pokeobj.map((pokemon, index) => (
-        <div key={index}>
-          <img src={pokemon.picture} alt={pokemon.name} className="mb-2" />
-          <p>{pokemon.name}</p>
-        </div>
-      ))}
-    </div>
-  );
-};
 
 const Battle = () => {
-  fetchPoke();
+  const [systemPokemons, setSystemPokemons] = useState([]);
+  const [userPokemons, setUserPokemons] = useState([]);
+  const [currentSystemPokemonIndex, setCurrentSystemPokemonIndex] = useState(0);
+  const [currentUserPokemonIndex, setCurrentUserPokemonIndex] = useState(0);
+  const [winner, setWinner] = useState('');
 
-  const localPoke = localStorage.getItem("pkmRoster");
-  if (localPoke === null) {
+  const [turn, setTurn] = useState('user');
+
+  useEffect(() => {
+    // Fetch system Pokémon and get user Pokémon from localStorage
+    const fetchPokemons = async () => {
+      const fetchedSystemPokemons = await fetchRandomPokemons();
+      setSystemPokemons(fetchedSystemPokemons);
+      const savedUserPokemons = await getUserPokemons();
+      console.log('savedUserPokemons', savedUserPokemons)
+      setUserPokemons(savedUserPokemons);
+    };
+
+    fetchPokemons();
+  }, []);
+
+  useEffect(() => {
+    if (systemPokemons.length === 0 || userPokemons.length === 0) return;
+
+    const battleInterval = setInterval(() => {
+      if (turn === 'user') {
+        // User attacks system
+        const newSystemPokemons = [...systemPokemons];
+        newSystemPokemons[currentSystemPokemonIndex].hp -= userPokemons[currentUserPokemonIndex].attack;
+        if (newSystemPokemons[currentSystemPokemonIndex].hp <= 0) {
+          if (currentSystemPokemonIndex < systemPokemons.length - 1) {
+            setCurrentSystemPokemonIndex(currentSystemPokemonIndex + 1);
+          } else {
+            setWinner('User');
+            clearInterval(battleInterval);
+            return;
+          }
+        }
+        setSystemPokemons(newSystemPokemons);
+        setTurn('system');
+      } else {
+        // System attacks user
+        const newUserPokemons = [...userPokemons];
+        newUserPokemons[currentUserPokemonIndex].hp -= systemPokemons[currentSystemPokemonIndex].attack;
+        if (newUserPokemons[currentUserPokemonIndex].hp <= 0) {
+          if (currentUserPokemonIndex < userPokemons.length - 1) {
+            setCurrentUserPokemonIndex(currentUserPokemonIndex + 1);
+          } else {
+            setWinner('System')
+            clearInterval(battleInterval);
+            return;
+          }
+        }
+        setUserPokemons(newUserPokemons);
+        setTurn('user');
+      }
+    }, 1000);
+
+    return () => clearInterval(battleInterval);
+  }, [turn, currentSystemPokemonIndex, currentUserPokemonIndex, systemPokemons, userPokemons]);
+
+
+  const hpSlider = (hp) => {
+    const percentage = Math.max(0, (hp / 100) * 100);
     return (
-      <div className="flex w-full max-w-4xl items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 shadow-lg">
-        <p className="items-center text-center">
-          Bitte erst deine Pokemons wählen :)
-        </p>{" "}
-      </div>
+      <div className="relative w-full bg-gray-300 rounded-full h-6">
+        <div
+          className="bg-red-500 h-full rounded-full transition-all duration-500"
+          style={{ width: `${percentage}%`, maxWidth: '100%' }}
+        ></div>
+        <div className=" top-0 left-0 w-full text-center text-xs font-medium text-white">
+          {hp} / {100}
+        </div>
+      </div >
     );
-  }
-  const Pokeobj = JSON.parse(localPoke);
-
-  const sysPoke = localStorage.getItem("syspokemons");
-  const Sysobj = JSON.parse(sysPoke);
+  };
 
   return (
-    <div className="flex min-h-screen flex-col justify-center bg-black">
-      <div className="flex flex-1 items-center justify-center">
-        <div className="w-1/4 p-4">
-          <HumanPokeTeam />
-        </div>
-        <div className="flex w-1/2 flex-col items-center justify-center p-4">
-          <h1 className="mb-8 text-4xl font-extrabold text-rose-700">
-            BATTLE-1
-          </h1>
-          <div className="flex w-full max-w-4xl justify-around rounded-lg border-4 border-blue-400 bg-black p-6 shadow-lg">
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col items-center">
-                <img
-                  src={Pokeobj[0].picture}
-                  alt={Pokeobj[0].name}
-                  className="mb-2"
-                />
-                <p>{Pokeobj[0].name}</p>
+
+    <div className="">
+      <div className="flex h-max w-max flex-col items-center justify-center bg-black">
+        <div className="flex h-max flex-1 items-center justify-center">
+          <div className="w-1/4 p-4">
+            <div className="flex h-full flex-col items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 text-center shadow-lg">
+              <p className="font-extrabold text-yellow-500">User Pokemon</p>
+
+              {userPokemons.map((pokemon, index) => (
+                <div key={index}>
+                  <img
+                    src={pokemon.picture}
+                    alt={pokemon.name}
+                    className="mb-2"
+                  />
+                  <p>{pokemon.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex w-max flex-col place-content-stretch items-center justify-center p-4">
+            <h1 className="mb-8 text-4xl font-extrabold text-rose-700">
+              BATTLE
+            </h1>
+            <div className="flex w-min items-center justify-around rounded-lg border-4 border-blue-400 bg-black p-10 shadow-lg">
+              <div className="flex flex-col place-content-stretch items-center justify-center">
+                {userPokemons[currentUserPokemonIndex] &&
+                  <div className="flex h-[300px] w-[300px] flex-col items-center justify-center">
+                    <img
+                      src={userPokemons[currentUserPokemonIndex].picture}
+                      alt={userPokemons[currentUserPokemonIndex].name}
+                      className="h-[300px] w-[300px] object-cover"
+                    />
+                    <p> {userPokemons[currentUserPokemonIndex].name} </p>
+                    {hpSlider(userPokemons[currentUserPokemonIndex].hp)}
+                  </div>
+                }
+
+              </div>
+              <div className="flex flex-col place-content-stretch items-center justify-center">
+                <div className="mb-4 flex place-content-stretch items-center justify-center">
+                  <div className="mx-4 place-content-stretch p-4 text-2xl text-rose-600">
+                    VS
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col place-content-stretch items-center justify-center">
+                {systemPokemons[currentSystemPokemonIndex] &&
+
+                  <div className="flex h-[300px] w-[300px] flex-col items-center justify-center">
+                    <img
+                      src={systemPokemons[currentSystemPokemonIndex].picture}
+                      alt={systemPokemons[currentSystemPokemonIndex].name}
+                      className="h-[300px] w-[300px] object-cover"
+                    />
+                    <p>{systemPokemons[currentSystemPokemonIndex].name}</p>
+                    {hpSlider(systemPokemons[currentSystemPokemonIndex].hp)}
+                  </div>
+                }
               </div>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="mb-4 flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-red-400">
-                    {Pokeobj[0].name}
-                  </p>
-                </div>
-                <div className="mx-4 text-2xl text-rose-600">VS</div>
-                <div className="text-center opacity-50">
-                  <p className="text-2xl font-bold text-red-400">
-                    {Sysobj[0].name}
-                  </p>
-                </div>
-              </div>
-              <p className="underlined text-xl font-semibold text-green-500 decoration-red-900 decoration-double">
-                {Sysobj[0].name} won!
+            {winner == 'System' &&
+              < p className="underlined py-8 text-6xl font-extrabold text-red-500 decoration-red-900 decoration-double">
+                {winner} won :(
               </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col items-center">
-                <img
-                  src={Sysobj[0].pic}
-                  alt={Sysobj[0].name}
-                  className="mb-2"
-                />
-                <p>{Sysobj[0].name}</p>
-              </div>
+            }
+            {winner == 'User' &&
+              < p className="underlined py-8 text-6xl font-extrabold text-green-500 decoration-red-900 decoration-double">
+                {winner} won :)
+              </p>
+            }
+          </div>
+          <div className="w-1/4 p-4">
+            {" "}
+            <div className="flex h-full flex-col items-center justify-center rounded-lg border-4 border-blue-400 bg-black p-6 text-center shadow-lg">
+              <p className="font-extrabold text-yellow-500">System Pokemon</p>
+
+              {systemPokemons.map((pokemon, index) => (
+                <div key={index}>
+                  <img src={pokemon.picture} alt={pokemon.name} className="mb-2" />
+                  <p>{pokemon.name}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-        <div className="w-1/4 p-4">
-          <SysPokeTeam />
-        </div>
       </div>
-    </div>
+    </div >
   );
 };
 

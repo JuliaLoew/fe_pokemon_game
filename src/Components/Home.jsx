@@ -35,6 +35,7 @@ const Home = () => {
       const response = await fetch(url);
       const pokemon = await response.json();
       return {
+        ...pokemon,
         id: pokemon.id,
         name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
         weight: pokemon.weight,
@@ -107,11 +108,10 @@ const Home = () => {
             </div>
             <button
               onClick={() => saveToRoster(pokemon)}
-              className={`mx-4 inline-flex items-center justify-center rounded-lg border-2 p-2 font-bold ${
-                roster.find((p) => p.id === pokemon.id)
-                  ? "bg-gray-300 text-red-500"
-                  : "border-blue-400"
-              }`}
+              className={`mx-4 inline-flex items-center justify-center rounded-lg border-2 p-2 font-bold ${roster.find((p) => p.id === pokemon.id)
+                ? "bg-gray-300 text-red-500"
+                : "border-blue-400"
+                }`}
             >
               {roster.find((p) => p.id === pokemon.id)
                 ? "I play with you"
